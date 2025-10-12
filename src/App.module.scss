@@ -1,12 +1,37 @@
 @import url('https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+* {
+    font-family: "PT Sans", sans-serif;
+}
+.wind {
+  background-color: rgb(229, 229, 229, 33%);
+}
 .main {
   display: flex;
   flex-flow: column;
   margin: 0 auto;
-  width: 80%;
+  width: 70%;
   gap: 20px;
+  padding: 0 10px;
+  border: 1px solid rgb(66, 86, 122, 10%);
+  border-top: none;
+  height: 100vh;
+  border-bottom: none;
+  &__verticalLine {
+    position: absolute;
+    border-left: 1px solid rgb(66, 86, 122, 10%);
+    height: 100vh;
+    align-self: center;
+  }
+  &__horizontalLine {
+    position: absolute;
+    border-top: 1px solid rgb(66, 86, 122, 10%);
+    height: 1px;
+    width: inherit;
+    top: 42%;
+    align-self: center;
+  }
   &__h1 {
-    font-family: "PT Sans", sans-serif;
+    margin-top: 9%;
     padding-left: 80px;
     font-weight: bold;
     width: 20%;
@@ -16,26 +41,110 @@
     border-image: linear-gradient(to bottom, #3877EE 0%, #EF5DA8 100%) 1;
   }
   &__years {
-    margin: 0 auto;
+    margin-top: -40px;
+    align-self: center;
     display: flex;
     justify-content: center;
     gap: 10%;
-    width: 80%;
+    width: 50%;
     height: 160px;
-  }
-  &__swiperBlock {
-    align-self: center;
-    width: 80%;
-    margin-top: 100px;
-
   }
 }
 .year {
   font-family: "PT sans", sans-serif;
   color: #EF5DA8;
   font-weight: bold;
-  font-size: 200px;
+  font-size: 170px;
 }
 .year:first-child {
   color: #5D5FEF;
+}
+.nav {
+  position: relative;
+  top: 120px;
+  padding-left: 80px;
+  &__btns {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+  }
+  &__arrow {
+    display: flex;
+    width: 50px;
+    height: 50px;
+    border: 1px solid rgb(66, 86, 122, 60%);
+    border-radius: 50%;
+    margin-top: 14px;
+    background-color: rgb(229, 229, 229, 33%);
+    cursor: pointer;
+  }
+  &__arrow:disabled {
+    border-color: rgb(66, 86, 122, 20%);;
+    cursor: default;
+  }
+  &__arrow:not(:disabled):hover {
+    animation: color-change 1s 1;
+    animation-fill-mode: forwards;
+  }
+  &__counter {
+    color: #42567A;
+  }
+}
+.prevArrow, .nextArrow {
+  margin: 0 auto;
+  padding-right: 4px;
+  width: 10px;
+}
+.nextArrow {
+  padding-right: 0;
+}
+.swiperW {
+  margin: 0 80px;
+  margin-top: 120px;
+  &__slide {
+    font-size: 20px;
+    width: calc(inherit / 3);
+    min-height: 150px;
+    color: #42567A;
+  }
+}
+.swiperW__slide > span {
+  font-size: 25px;
+  color: #3877EE;
+  font-weight: bold;
+}
+.swiperButtonNext {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #fff;
+  box-shadow: 0 0 5px rgb(56, 119, 238, 20%);
+  border: none;
+  position: relative;
+  left: 101%;
+  cursor: pointer;
+  bottom: 50%;
+
+}
+.swiperButtonPrev {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #fff;
+  border: none;
+  position: relative;
+  left: -6.5%;
+  cursor: pointer;
+  top: 30%;
+  box-shadow: 0 0 5px rgb(56, 119, 238, 20%);
+}
+.swiperButtonPrev > img{
+  transform: rotate(180deg);
+}
+.swiperButtonPrev:disabled, .swiperButtonNext:disabled {
+  visibility: hidden;
+}
+@keyframes color-change {
+  0% { background-color: rgb(229, 229, 229, 33%);}
+  100% { background-color: #fff; }
 }
