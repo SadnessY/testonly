@@ -31,7 +31,7 @@
     align-self: center;
   }
   &__h1 {
-    margin-top: 9%;
+    margin-top: 5%;
     padding-left: 80px;
     font-weight: bold;
     width: 20%;
@@ -41,7 +41,7 @@
     border-image: linear-gradient(to bottom, #3877EE 0%, #EF5DA8 100%) 1;
   }
   &__years {
-    margin-top: -40px;
+    margin-top: -15px;
     align-self: center;
     display: flex;
     justify-content: center;
@@ -60,8 +60,9 @@
   color: #5D5FEF;
 }
 .nav {
+  margin-top: -35%;
   position: relative;
-  top: 120px;
+  top: 110px;
   padding-left: 80px;
   &__btns {
     display: flex;
@@ -89,6 +90,30 @@
   &__counter {
     color: #42567A;
   }
+  &__circle {
+    border-radius: 50%;
+    width: 450px;
+    height: 450px;
+    position: relative;
+    border: 1px solid rgb(66, 86, 122, 10%);
+    top: 12%;
+    left: 28.5%;
+  }
+}
+.circle__point {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.circle__point:hover, .point__active {
+  cursor: pointer;
+  content: attr(id);
+  width: 56px;
+  height: 56px;
+  background-color: #fff;
+  border: 1px solid rgb(66, 86, 122, 40%);
+  border-radius: 50%;
 }
 .prevArrow, .nextArrow {
   margin: 0 auto;
@@ -99,8 +124,7 @@
   padding-right: 0;
 }
 .swiperW {
-  margin: 0 80px;
-  margin-top: 120px;
+  margin: 100px 80px 0;
   &__slide {
     font-size: 20px;
     width: calc(inherit / 3);
@@ -145,6 +169,5 @@
   visibility: hidden;
 }
 @keyframes color-change {
-  0% { background-color: rgb(229, 229, 229, 33%);}
   100% { background-color: #fff; }
 }
