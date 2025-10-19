@@ -10,6 +10,15 @@ import circlePoint from "./imgs/circlePoint.svg"
 import "swiper/css";
 
 
+interface dataItem{
+    x: number,
+    y: number,
+    id: number,
+    name: string,
+    startYear: number,
+    endYear: number,
+    slides: object[]
+}
 const App : React.FC = () : React.ReactElement => {
     const [dates, setDates] = useState(1)  //выбранная тема по номеру, не назвал theme, тк зачастую это слово используется для темы приложения, но можно че нить придумать интереснее
     const [data, setData] = useState([      // можно загрузить данные с сервера, в моем варианте не используется setData, тк данные введены вручную, к тому же не знаю структуру данных на сервере, так что типизировать тоже не стал
@@ -92,6 +101,30 @@ const App : React.FC = () : React.ReactElement => {
             setDates((dates) => dates + 1)
         }
     }
+    const evLisCl = (card: HTMLElement, obj: dataItem) => {
+            const lastActive = document.getElementsByClassName(styles.point__active)[0] as HTMLElement
+            lastActive.classList.remove(styles.point__active)
+            lastActive.innerHTML = `<img src="${circlePoint}" alt="Переключение темы">`
+            lastActive.style.top = Number(lastActive.style.top.replace('px', '')) + 25 + "px"
+            lastActive.style.left = Number(lastActive.style.left.replace('px', '')) + 24 + "px"
+            card.innerText = obj.id.toString()
+            card.style.top = obj.y + 200 + "px"
+            card.style.left = obj.x + 202 + "px";
+            card.classList.add(styles.point__active)
+            setDates(Number(card.id))
+    }
+    const evLisME = (card: HTMLElement, obj: dataItem) => {
+        card.innerText = obj.id.toString()
+        card.style.top = obj.y + 200 + "px"
+        card.style.left = obj.x + 202 + "px";
+    }
+    const evLisML = (card: HTMLElement, obj: dataItem) => {
+        if (!card.classList.toString().includes(styles.point__active)) {
+            card.innerHTML = `<img src="${circlePoint}" alt="Переключение темы">`
+            card.style.left = obj.x + 226 + "px";
+            card.style.top  = obj.y + 225 + "px";
+        }
+    }
     const renderCircle = useCallback((() => {
         const R = 225;
         const IMG_SIZE = 6;
@@ -103,19 +136,10 @@ const App : React.FC = () : React.ReactElement => {
             let params = Object.assign({x, y}, data[i]);
             create_card(params);
         }
-        interface dataItem{
-            x: number,
-            y: number,
-            id: number,
-            name: string,
-            startYear: number,
-            endYear: number,
-            slides: object[]
-        }
         function create_card(obj: dataItem) {
             let root = document.createElement("div");
             root.innerHTML = (`
-                <div>
+                <div id=${obj.id}>
                     <img src="${circlePoint}" alt="Переключение темы">
                 </div>
             `);
@@ -123,29 +147,9 @@ const App : React.FC = () : React.ReactElement => {
             card.classList.add(styles.circle__point)
             card.style.left = obj.x + 226 + "px";
             card.style.top  = obj.y + 225 + "px";
-            card.addEventListener('click', () => {
-                const lastActive = document.getElementsByClassName(styles.point__active)[0] as HTMLElement
-                lastActive.classList.remove(styles.point__active)
-                lastActive.innerHTML = `<img src="${circlePoint}" alt="Переключение темы">`
-                lastActive.style.top = Number(lastActive.style.top.replace('px', '')) + 25 + "px"
-                lastActive.style.left = Number(lastActive.style.left.replace('px', '')) + 24 + "px"
-                card.innerText = obj.id.toString()
-                card.style.top = obj.y + 200 + "px"
-                card.style.left = obj.x + 202 + "px";
-                card.classList.add(styles.point__active)
-            })
-            card.addEventListener('mouseenter', () => {
-                card.innerText = obj.id.toString()
-                card.style.top = obj.y + 200 + "px"
-                card.style.left = obj.x + 202 + "px";
-            })
-            card.addEventListener('mouseleave', () => {
-                if (!card.classList.toString().includes(styles.point__active)) {
-                    card.innerHTML = `<img src="${circlePoint}" alt="Переключение темы">`
-                    card.style.left = obj.x + 226 + "px";
-                    card.style.top  = obj.y + 225 + "px";
-                }
-            })
+            card.addEventListener('click', () => evLisCl(card, obj))
+            card.addEventListener('mouseenter', () => evLisME(card, obj))
+            card.addEventListener('mouseleave', () => evLisML(card, obj))
             parent.appendChild(card);
         }
         const first = document.getElementsByClassName(styles.circle__point)[0] as HTMLElement
@@ -154,6 +158,14 @@ const App : React.FC = () : React.ReactElement => {
         first.style.top = (R * Math.cos(0) - IMG_SIZE / 2) - 250 + "px"
         first.style.left = (R * Math.sin(0) - IMG_SIZE / 2) + 202 + "px";
     }), [data])
+    const handleYearsChange = () => {
+        const lastActive = document.getElementsByClassName(styles.point__active)[0] as HTMLElement
+        lastActive.innerHTML = `<img src="${circlePoint}" alt="Переключение темы"></img>`
+        lastActive.classList.remove(styles.point__active)
+        const nextActive = document.getElementById(dates.toString()) as HTMLElement
+        nextActive.innerText = data.filter(el => el.id === dates)[0].id.toString()
+        nextActive.classList.add(styles.point__active)
+    }
     useEffect(() => {
         setStart(data.filter(item => item.id === dates)[0].startYear);
         setEnd(data.filter(item => item.id === dates)[0].endYear);
@@ -181,6 +193,13 @@ const App : React.FC = () : React.ReactElement => {
             duration: 1,
             ease: "power1.in"
         })
+        return () => {
+            Array.from(document.getElementsByClassName(styles.circle__point)).forEach((el) => {
+                el.removeEventListener("click", () => evLisCl)
+                el.removeEventListener("mouseenter", () => evLisME)
+                el.removeEventListener("mouseleave", () => evLisML)
+            })
+        }
     }, [dates, start, end, swiper, data]);
     useLayoutEffect(() => {
         renderCircle()
@@ -197,7 +216,7 @@ const App : React.FC = () : React.ReactElement => {
                 </div>
                 <div className={styles.nav}>
                     <div className={styles.nav__circle}>{}</div>
-                    <span className={styles.nav__counter}>0{dates}/0{data.length}</span>
+                    <span onChange={handleYearsChange} className={styles.nav__counter}>0{dates}/0{data.length}</span>
                     <div className={styles.nav__btns}>
                         <button onClick={(e) => handleBtnClick(e)} disabled={dates === 1} className={styles.nav__arrow}><img src={prevBtn} className={styles.prevArrow} alt='Предыдущая тема'></img></button>
                         <button onClick={(e) => handleBtnClick(e)} disabled={dates === data.length} className={styles.nav__arrow}><img src={nextBtn} className={styles.nextArrow} alt='Следующая тема'></img></button>

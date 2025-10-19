@@ -108,12 +108,16 @@
 }
 .circle__point:hover, .point__active {
   cursor: pointer;
-  content: attr(id);
   width: 56px;
   height: 56px;
   background-color: #fff;
   border: 1px solid rgb(66, 86, 122, 40%);
   border-radius: 50%;
+  content: attr(id);
+}
+.circle__point:hover {
+  animation: point-hover 1s 1;
+  animation-fill-mode: forwards;
 }
 .prevArrow, .nextArrow {
   margin: 0 auto;
@@ -169,5 +173,7 @@
   visibility: hidden;
 }
 @keyframes color-change {
-  100% { background-color: #fff; }
+  100% { 
+    background-color: #fff;
+  }
 }
