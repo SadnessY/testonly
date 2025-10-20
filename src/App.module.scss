@@ -91,16 +91,16 @@
     color: #42567A;
   }
   &__circle {
-    border-radius: 50%;
-    width: 450px;
-    height: 450px;
-    position: relative;
-    border: 1px solid rgb(66, 86, 122, 10%);
-    top: 12%;
-    left: 28.5%;
-  }
+     border-radius: 50%;
+     width: 450px;
+     height: 450px;
+     position: relative;
+     border: 1px solid rgb(66, 86, 122, 10%);
+     top: 12%;
+     left: 28.5%;
+   }
 }
-.circle__point {
+.circle__point , .point__active{
   position: absolute;
   display: flex;
   justify-content: center;
@@ -108,12 +108,6 @@
 }
 .circle__point:hover, .point__active {
   cursor: pointer;
-  width: 56px;
-  height: 56px;
-  background-color: #fff;
-  border: 1px solid rgb(66, 86, 122, 40%);
-  border-radius: 50%;
-  content: attr(id);
 }
 .circle__point:hover {
   animation: point-hover 1s 1;

@@ -1,15 +1,13 @@
-import React, {useState, useRef, useEffect, useLayoutEffect, useCallback} from 'react';
+import React, {useState, useRef, useEffect, useCallback} from 'react';
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import { gsap } from "gsap";
-import styles from "./App.module.scss";
+import * as styles from './App.module.scss';
 import prevBtn from "./imgs/prevbtn.svg";
 import nextBtn from "./imgs/nextbtn.svg";
 import nextSlide from "./imgs/nextSlide.svg"
 import circlePoint from "./imgs/circlePoint.svg"
 import "swiper/css";
-
-
 interface dataItem{
     x: number,
     y: number,
@@ -20,8 +18,8 @@ interface dataItem{
     slides: object[]
 }
 const App : React.FC = () : React.ReactElement => {
-    const [dates, setDates] = useState(1)  //выбранная тема по номеру, не назвал theme, тк зачастую это слово используется для темы приложения, но можно че нить придумать интереснее
-    const [data, setData] = useState([      // можно загрузить данные с сервера, в моем варианте не используется setData, тк данные введены вручную, к тому же не знаю структуру данных на сервере, так что типизировать тоже не стал
+    const [dates, setDates] = useState(6)  //выбранная тема по номеру, не назвал theme, тк зачастую это слово используется для темы приложения, но можно че нить придумать интереснее
+    const [data, setData] = useState([
         { id: 1, name: 'Технологии', startYear: 1980, endYear: 1986, 
             slides: [
             {1980: 'Sinclare Research выпускают домашний компьютер ZX80'},
@@ -87,53 +85,89 @@ const App : React.FC = () : React.ReactElement => {
                 {2022: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.'},
             ]
         }
-    ])
+    ]) // можно загрузить данные с сервера, в моем варианте не используется setData, тк данные введены вручную, к тому же не знаю структуру данных на сервере, так что типизировать тоже не стал
     const swiper = useRef(Swiper.prototype)
     const startEl = useRef(HTMLDivElement.prototype);
     const endEl = useRef(HTMLDivElement.prototype);
     const [start, setStart] = useState(data.filter(item => item.id === dates)[0].startYear || 0);
     const [end, setEnd] = useState(data.filter(item => item.id === dates)[0].endYear || 0);
-    const handleBtnClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        if (e.target === document.getElementsByClassName(styles.nav__arrow)[0]) {
-            setDates((dates) => dates - 1)
-        }
-        if (e.target === document.getElementsByClassName(styles.nav__arrow)[1]){
-            setDates((dates) => dates + 1)
-        }
+    const lastActive = useRef(HTMLElement.prototype)
+    const upData = useRef<dataItem[]>([])
+    const removeActivePoint = () => {
+        const prevActive = document.getElementsByClassName(styles.point__active)[0] as HTMLElement
+        lastActive.current = prevActive
+        prevActive.classList.remove(styles.point__active)
+        prevActive.innerHTML = `<img src="${circlePoint}" alt="Переключение темы">`
+        gsap.to(prevActive, {
+            duration: 0,
+            width: 6,
+            height: 6,
+            border: "none",
+            ease: "power1.in",
+            top: `${upData.current.filter(el => el.id === Number(prevActive.id))[0].y + 225}px`,
+            left: `${upData.current.filter(el => el.id === Number(prevActive.id))[0].x + 226}px`
+        })
     }
-    const evLisCl = (card: HTMLElement, obj: dataItem) => {
-            const lastActive = document.getElementsByClassName(styles.point__active)[0] as HTMLElement
-            lastActive.classList.remove(styles.point__active)
-            lastActive.innerHTML = `<img src="${circlePoint}" alt="Переключение темы">`
-            lastActive.style.top = Number(lastActive.style.top.replace('px', '')) + 25 + "px"
-            lastActive.style.left = Number(lastActive.style.left.replace('px', '')) + 24 + "px"
-            card.innerText = obj.id.toString()
-            card.style.top = obj.y + 200 + "px"
-            card.style.left = obj.x + 202 + "px";
-            card.classList.add(styles.point__active)
-            setDates(Number(card.id))
+    const setActivePoint = () => {
+        if (document.getElementsByClassName(styles.point__active)[0]) {
+            removeActivePoint()
+        }
+        const active = document.getElementsByClassName(styles.circle__point)[dates - 1] as HTMLElement
+        active.classList.add(styles.point__active)
+        active.innerText = data[dates - 1].id.toString()
+        gsap.to(active,  {
+            duration: 0.3,
+            width: 56,
+            height: 56,
+            border: "1px solid rgb(66, 86, 122, 40%)",
+            backgroundColor: "#fff",
+            borderRadius: "50%",
+            ease: "power1.in",
+            top: `${upData.current.filter(el => el.id === Number(active.id))[0].y + 200}px`,
+            left: `${upData.current.filter(el => el.id === Number(active.id))[0].x + 202}px`
+        });
+    }
+    const evLisCl = (card: HTMLElement) => {
+        setDates(Number(card.id))
     }
     const evLisME = (card: HTMLElement, obj: dataItem) => {
         card.innerText = obj.id.toString()
-        card.style.top = obj.y + 200 + "px"
-        card.style.left = obj.x + 202 + "px";
+        if (!card.classList.toString().includes(styles.point__active)) {
+            gsap.to(card,  {
+                duration: 0.3,
+                width: 56,
+                height: 56,
+                border: "1px solid rgb(66, 86, 122, 40%)",
+                backgroundColor: "#fff",
+                borderRadius: "50%",
+                ease: "power1.in",
+                top: `${obj.y + 200}px`,
+                left: `${obj.x + 202}px`
+            });
+        }
     }
     const evLisML = (card: HTMLElement, obj: dataItem) => {
         if (!card.classList.toString().includes(styles.point__active)) {
             card.innerHTML = `<img src="${circlePoint}" alt="Переключение темы">`
-            card.style.left = obj.x + 226 + "px";
-            card.style.top  = obj.y + 225 + "px";
+            gsap.to(card, {
+                duration: 0,
+                width: 6,
+                height: 6,
+                border: "none",
+                ease: "power1.in",
+                top: `${obj.y + 225}px`,
+                left: `${obj.x + 226}px`
+            });
         }
     }
     const renderCircle = useCallback((() => {
-        const R = 225;
-        const IMG_SIZE = 6;
         let parent = document.getElementsByClassName(styles.nav__circle)[0];
         for (let i = 0; i < data.length; i++) {
             let radian = i * (2 * Math.PI / data.length) - 0.5 * Math.PI;
-            let x = R * Math.cos(radian) - IMG_SIZE / 2;
-            let y = R * Math.sin(radian) - IMG_SIZE / 2;
+            let x = 225 * Math.cos(radian) - 6 / 2;
+            let y = 225 * Math.sin(radian) - 6 / 2;
             let params = Object.assign({x, y}, data[i]);
+            upData.current.push(params)
             create_card(params);
         }
         function create_card(obj: dataItem) {
@@ -147,25 +181,14 @@ const App : React.FC = () : React.ReactElement => {
             card.classList.add(styles.circle__point)
             card.style.left = obj.x + 226 + "px";
             card.style.top  = obj.y + 225 + "px";
-            card.addEventListener('click', () => evLisCl(card, obj))
+            card.style.color = "#42567A"
+            card.style.fontSize = "20"
+            card.addEventListener('click', () => evLisCl(card))
             card.addEventListener('mouseenter', () => evLisME(card, obj))
             card.addEventListener('mouseleave', () => evLisML(card, obj))
             parent.appendChild(card);
         }
-        const first = document.getElementsByClassName(styles.circle__point)[0] as HTMLElement
-        first.classList.add(styles.point__active)
-        first.innerText = data[0].id.toString()
-        first.style.top = (R * Math.cos(0) - IMG_SIZE / 2) - 250 + "px"
-        first.style.left = (R * Math.sin(0) - IMG_SIZE / 2) + 202 + "px";
     }), [data])
-    const handleYearsChange = () => {
-        const lastActive = document.getElementsByClassName(styles.point__active)[0] as HTMLElement
-        lastActive.innerHTML = `<img src="${circlePoint}" alt="Переключение темы"></img>`
-        lastActive.classList.remove(styles.point__active)
-        const nextActive = document.getElementById(dates.toString()) as HTMLElement
-        nextActive.innerText = data.filter(el => el.id === dates)[0].id.toString()
-        nextActive.classList.add(styles.point__active)
-    }
     useEffect(() => {
         setStart(data.filter(item => item.id === dates)[0].startYear);
         setEnd(data.filter(item => item.id === dates)[0].endYear);
@@ -193,6 +216,10 @@ const App : React.FC = () : React.ReactElement => {
             duration: 1,
             ease: "power1.in"
         })
+    }, [dates, start, end, swiper, data]);
+    useEffect(() => {
+        renderCircle()
+        setActivePoint()
         return () => {
             Array.from(document.getElementsByClassName(styles.circle__point)).forEach((el) => {
                 el.removeEventListener("click", () => evLisCl)
@@ -200,10 +227,25 @@ const App : React.FC = () : React.ReactElement => {
                 el.removeEventListener("mouseleave", () => evLisML)
             })
         }
-    }, [dates, start, end, swiper, data]);
-    useLayoutEffect(() => {
-        renderCircle()
     }, [renderCircle])
+    useEffect(() => {
+        setActivePoint()
+        let parentRot = (Number(lastActive.current.id) + dates) * (360 / data.length)
+        const parent = document.getElementsByClassName(styles.nav__circle)[0] as HTMLElement;
+        console.log(parent)
+        gsap.to(parent, {
+            rotation: parentRot,
+            ease: "none",
+            transformOrigin: "center"
+        });
+        Array.from(document.getElementsByClassName(styles.circle__point)).forEach((el) => {
+            gsap.to(el,{
+                rotation: -parentRot,
+                ease: "none",
+                transformOrigin: "center"
+            })
+        })
+    }, [dates])
     return (
         <div className={styles.wind}>
             <div className={styles.main}>
@@ -215,11 +257,12 @@ const App : React.FC = () : React.ReactElement => {
                     <div ref={endEl} className={styles.year}></div>
                 </div>
                 <div className={styles.nav}>
-                    <div className={styles.nav__circle}>{}</div>
-                    <span onChange={handleYearsChange} className={styles.nav__counter}>0{dates}/0{data.length}</span>
+                    <div className={styles.nav__circle}>
+                    </div>
+                    <span className={styles.nav__counter}>0{dates}/0{data.length}</span>
                     <div className={styles.nav__btns}>
-                        <button onClick={(e) => handleBtnClick(e)} disabled={dates === 1} className={styles.nav__arrow}><img src={prevBtn} className={styles.prevArrow} alt='Предыдущая тема'></img></button>
-                        <button onClick={(e) => handleBtnClick(e)} disabled={dates === data.length} className={styles.nav__arrow}><img src={nextBtn} className={styles.nextArrow} alt='Следующая тема'></img></button>
+                        <button onClick={() => setDates((dates) => dates - 1)} disabled={dates === 1} className={styles.nav__arrow}><img src={prevBtn} className={styles.prevArrow} alt='Предыдущая тема'></img></button>
+                        <button onClick={() => setDates((dates) => dates + 1)} disabled={dates === data.length} className={styles.nav__arrow}><img src={nextBtn} className={styles.nextArrow} alt='Следующая тема'></img></button>
                     </div>
                 </div>
                 <div className={styles.swiperW}>
