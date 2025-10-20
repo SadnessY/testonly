@@ -109,9 +109,6 @@ const App : React.FC = () : React.ReactElement => {
         })
     }
     const setActivePoint = () => {
-        if (document.getElementsByClassName(styles.point__active)[0]) {
-            removeActivePoint()
-        }
         const active = document.getElementsByClassName(styles.circle__point)[dates - 1] as HTMLElement
         active.classList.add(styles.point__active)
         active.innerText = data[dates - 1].id.toString()
@@ -229,6 +226,7 @@ const App : React.FC = () : React.ReactElement => {
         }
     }, [renderCircle])
     useEffect(() => {
+        removeActivePoint()
         setActivePoint()
         let parentRot = (Number(lastActive.current.id) + dates) * (360 / data.length)
         const parent = document.getElementsByClassName(styles.nav__circle)[0] as HTMLElement;
